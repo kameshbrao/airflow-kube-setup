@@ -19,10 +19,16 @@
 
 set -x
 
+ls -ltr 
+ls -ltr /usr/local
+ls -ltr /usr/local/airflow
+
+cat /usr/local/airflow.cfg
+
 cd /usr/local/lib/python3.6/site-packages/airflow && \
-cp -R example_dags/* /root/airflow/dags/ && \
-cp -R contrib/example_dags/example_kubernetes_*.py /root/airflow/dags/ && \
-cp -a contrib/example_dags/libs /root/airflow/dags/ && \
+#cp -R example_dags/* /usr/local/airflow/dags/ && \
+#cp -R contrib/example_dags/example_kubernetes_*.py /usr/local/airflow/dags/ && \
+#cp -a contrib/example_dags/libs /usr/local/airflow/dags/ && \
 airflow initdb && \
 alembic upgrade heads && \
 (airflow create_user --username airflow --lastname airflow --firstname jon --email airflow@apache.org --role Admin --password airflow || true) 

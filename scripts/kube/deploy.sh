@@ -19,11 +19,11 @@
 
 set -x
 
-AIRFLOW_IMAGE=gcr.io/deeplearning-181416/airflow-cdh:0.0.1
-AIRFLOW_TAG=0.0.1
+AIRFLOW_IMAGE=reg-dhc.app.corpintra.net/dna_selfservice/airflow
+AIRFLOW_TAG=1.0.0
 DIRNAME=$(cd "$(dirname "$0")"; pwd)
 TEMPLATE_DIRNAME=${DIRNAME}/templates
-BUILD_DIRNAME=${DIRNAME}/build
+BUILD_DIRNAME=${DIRNAME}/sample_build
 
 usage() {
     cat << EOF
@@ -71,14 +71,14 @@ rm -f ${BUILD_DIRNAME}/*
 if [ "${GIT_SYNC}" = 0 ]; then
     INIT_DAGS_VOLUME_NAME=airflow-dags
     POD_AIRFLOW_DAGS_VOLUME_NAME=airflow-dags
-    CONFIGMAP_DAGS_FOLDER=/root/airflow/dags
+    CONFIGMAP_DAGS_FOLDER=/usr/local/airflow/dags
     CONFIGMAP_GIT_DAGS_FOLDER_MOUNT_POINT=
     CONFIGMAP_DAGS_VOLUME_CLAIM=airflow-dags
 else
     INIT_DAGS_VOLUME_NAME=airflow-dags-fake
     POD_AIRFLOW_DAGS_VOLUME_NAME=airflow-dags-git
-    CONFIGMAP_DAGS_FOLDER=/root/airflow/dags/repo/airflow/contrib/example_dags
-    CONFIGMAP_GIT_DAGS_FOLDER_MOUNT_POINT=/root/airflow/dags
+    CONFIGMAP_DAGS_FOLDER=/usr/local/airflow/dags/repo/airflow/contrib/example_dags
+    CONFIGMAP_GIT_DAGS_FOLDER_MOUNT_POINT=/usr/local/airflow/dags
     CONFIGMAP_DAGS_VOLUME_CLAIM=
 fi
 CONFIGMAP_GIT_REPO=${TRAVIS_REPO_SLUG:-apache/airflow}
@@ -154,9 +154,10 @@ kubectl config set-context --current --namespace=airflow-example
 set -e
 
 kubectl apply -f $DIRNAME/secrets.yaml
+kubectl apply -f $DIRNAME/image-pull-secret.yml
 kubectl apply -f $BUILD_DIRNAME/configmaps.yaml
-kubectl apply -f $DIRNAME/postgres.yaml
-kubectl apply -f $DIRNAME/volumes.yaml
+#kubectl apply -f $DIRNAME/postgres.yaml
+#kubectl apply -f $DIRNAME/volumes.yaml
 kubectl apply -f $BUILD_DIRNAME/airflow.yaml
 
 # wait for up to 10 minutes for everything to be deployed

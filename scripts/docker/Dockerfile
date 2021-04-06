@@ -32,8 +32,33 @@ RUN pip install apache-airflow==1.10.10
 RUN pip install 'apache-airflow[kubernetes]'
 RUN pip install 'apache-airflow[postgres]'
 
+
+RUN cd /usr/local && mkdir airflow && chmod +x airflow && cd airflow
+
+ARG AIRFLOW_USER_HOME=/usr/local/airflow
+ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
+
+RUN useradd -ms /bin/bash 1000
+RUN usermod -a -G sudo 1000
+
 COPY airflow-test-env-init.sh /tmp/airflow-test-env-init.sh
+
+RUN mkdir -p /usr/local/airflow/dags
+RUN mkdir -p /usr/local/airflow/logs
+
+RUN cp -R /usr/local/lib/python3.6/site-packages/airflow/example_dags/* /usr/local/airflow/dags/ && \
+    cp -R /usr/local/lib/python3.6/site-packages/airflow/contrib/example_dags/example_kubernetes_*.py /usr/local/airflow/dags/ && \
+    cp -a /usr/local/lib/python3.6/site-packages/airflow/contrib/example_dags/libs /usr/local/airflow/dags/
+
+
+RUN chown -R 1000:1000 /usr/local
+RUN chmod -R 777 /usr/local
 
 COPY bootstrap.sh /bootstrap.sh
 RUN chmod +x /bootstrap.sh
+USER 1000 
 ENTRYPOINT ["/bootstrap.sh"]
+
+#Python Package Dependencies for Airflow
+RUN pip install SQLAlchemy==1.3.23
+RUN pip install Flask-SQLAlchemy==2.4.4

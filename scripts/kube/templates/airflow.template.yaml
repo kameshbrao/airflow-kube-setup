@@ -74,10 +74,10 @@ spec:
         imagePullPolicy: Always
         volumeMounts:
         - name: airflow-configmap
-          mountPath: /root/airflow/airflow.cfg
+          mountPath: /usr/local/airflow/airflow.cfg
           subPath: airflow.cfg
         - name: {{INIT_DAGS_VOLUME_NAME}}
-          mountPath: /root/airflow/dags
+          mountPath: /usr/local/airflow/dags
         env:
         - name: SQL_ALCHEMY_CONN
           valueFrom:
@@ -110,12 +110,12 @@ spec:
               key: sql_alchemy_conn
         volumeMounts:
         - name: airflow-configmap
-          mountPath: /root/airflow/airflow.cfg
+          mountPath: /usr/local/airflow/airflow.cfg
           subPath: airflow.cfg
         - name: {{POD_AIRFLOW_DAGS_VOLUME_NAME}}
-          mountPath: /root/airflow/dags
+          mountPath: /usr/local/airflow/dags
         - name: airflow-logs
-          mountPath: /root/airflow/logs
+          mountPath: /usr/local/airflow/logs
       - name: scheduler
         image: {{AIRFLOW_IMAGE}}:{{AIRFLOW_TAG}}
         imagePullPolicy: Always
@@ -132,12 +132,16 @@ spec:
               key: sql_alchemy_conn
         volumeMounts:
         - name: airflow-configmap
-          mountPath: /root/airflow/airflow.cfg
+          mountPath: /usr/local/airflow/airflow.cfg
           subPath: airflow.cfg
         - name: {{POD_AIRFLOW_DAGS_VOLUME_NAME}}
-          mountPath: /root/airflow/dags
+          mountPath: /usr/local/airflow/dags
         - name: airflow-logs
-          mountPath: /root/airflow/logs
+          mountPath: /usr/local/airflow/logs
+      securityContext:
+        runAsUser: 1000
+      imagePullSecrets:
+      - name: image-pull-secret
       volumes:
       - name: airflow-dags
         persistentVolumeClaim:
@@ -152,14 +156,14 @@ spec:
       - name: airflow-configmap
         configMap:
           name: airflow-configmap
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: airflow
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 8080
-  selector:
-    name: airflow
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: airflow
+# spec:
+#   type: LoadBalancer
+#   ports:
+#     - port: 8080
+#   selector:
+#     name: airflow

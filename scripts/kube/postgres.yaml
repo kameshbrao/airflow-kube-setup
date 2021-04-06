@@ -32,7 +32,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: postgres
-          image: postgres
+          image: reg-dhc.app.corpintra.net/i3/postgresql:10.3-2.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
@@ -52,24 +52,24 @@ spec:
               value: /var/lib/postgresql/data/pgdata
             - name: POD_IP
               valueFrom: { fieldRef: { fieldPath: status.podIP } }
-          livenessProbe:
-            initialDelaySeconds: 60
-            timeoutSeconds: 5
-            failureThreshold: 5
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - exec pg_isready --host $POD_IP ||  if [[ $(psql -qtAc --host $POD_IP 'SELECT pg_is_in_recovery') != "f" ]]; then  exit 0 else; exit 1; fi
-          readinessProbe:
-            initialDelaySeconds: 5
-            timeoutSeconds: 5
-            periodSeconds: 5
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - exec pg_isready --host $POD_IP
+          # livenessProbe:
+          #   initialDelaySeconds: 60
+          #   timeoutSeconds: 5
+          #   failureThreshold: 5
+          #   exec:
+          #     command:
+          #     - /bin/sh
+          #     - -c
+          #     - exec pg_isready --host $POD_IP ||  if [[ $(psql -qtAc --host $POD_IP 'SELECT pg_is_in_recovery') != "f" ]]; then  exit 0 else; exit 1; fi
+          # readinessProbe:
+          #   initialDelaySeconds: 5
+          #   timeoutSeconds: 5
+          #   periodSeconds: 5
+          #   exec:
+          #     command:
+          #     - /bin/sh
+          #     - -c
+          #     - exec pg_isready --host $POD_IP
           resources:
             requests:
               memory: .5Gi
@@ -89,3 +89,26 @@ spec:
       targetPort: 5432
   selector:
     name: postgres-airflow
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-airflow
+spec:
+  podSelector:
+    matchLabels:
+      name: postgres-airflow
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: postgres-airflow
+  - from:
+    - podSelector:
+        matchLabels:
+          name: airflow
+  - ports:
+    - port: 5432
+      protocol: TCP
+  policyTypes:
+  - Ingress

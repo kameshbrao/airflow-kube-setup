@@ -21,18 +21,18 @@ metadata:
 data:
   airflow.cfg: |
     [core]
-    dags_folder = /root/airflow/dags
-    base_log_folder = /root/airflow/logs
+    dags_folder = /usr/local/airflow/dags
+    base_log_folder = /usr/local/airflow/logs
     logging_level = INFO
     executor = KubernetesExecutor
     parallelism = 32
     load_examples = False
-    plugins_folder = /root/airflow/plugins
+    plugins_folder = /usr/local/airflow/plugins
     sql_alchemy_conn = $SQL_ALCHEMY_CONN
 
     [scheduler]
     dag_dir_list_interval = 300
-    child_process_log_directory = /root/airflow/logs/scheduler
+    child_process_log_directory = /usr/local/airflow/logs/scheduler
     # Task instances listen for external kill signal (when you clear tasks
     # from the CLI or the UI), this defines the frequency at which they should
     # listen (in seconds).
@@ -155,8 +155,8 @@ data:
 
     [kubernetes]
     airflow_configmap = airflow-configmap
-    worker_container_repository = pequetrefe/airflow
-    worker_container_tag = 0.0.1
+    worker_container_repository = reg-dhc.app.corpintra.net/dna_selfservice/airflow
+    worker_container_tag = 1.0.0
     worker_container_image_pull_policy = Always
     worker_service_account_name = airflow
     namespace = airflow-example
