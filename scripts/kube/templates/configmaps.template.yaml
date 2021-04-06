@@ -101,7 +101,7 @@ data:
     worker_refresh_interval = 30
 
     # Secret key used to run your flask app
-    secret_key = temporary_key
+    secret_key = 18a58f846390896b2ce002f66af04d2c99bcb8fafabefff6c86e2bbe20ae
 
     # Number of workers to run the Gunicorn web server
     workers = 4

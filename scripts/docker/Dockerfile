@@ -28,7 +28,7 @@ RUN apt-get update -y && apt-get install -y \
 
 RUN pip install --upgrade pip
 
-RUN pip install apache-airflow==1.10.10
+RUN pip install apache-airflow==1.10.14
 RUN pip install 'apache-airflow[kubernetes]'
 RUN pip install 'apache-airflow[postgres]'
 
@@ -44,7 +44,7 @@ RUN usermod -a -G sudo 1000
 COPY airflow-test-env-init.sh /tmp/airflow-test-env-init.sh
 
 RUN mkdir -p /usr/local/airflow/dags
-RUN mkdir -p /usr/local/airflow/logs
+RUN mkdir -p /usr/local/airflow/logs/scheduler
 
 RUN cp -R /usr/local/lib/python3.6/site-packages/airflow/example_dags/* /usr/local/airflow/dags/ && \
     cp -R /usr/local/lib/python3.6/site-packages/airflow/contrib/example_dags/example_kubernetes_*.py /usr/local/airflow/dags/ && \

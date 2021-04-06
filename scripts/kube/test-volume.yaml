@@ -1,0 +1,56 @@
+
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: test-counter
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: cinder
+#   resources:
+#     requests:
+#       storage: 1Gi
+# ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testvolume
+  labels:
+    app: testvolume
+spec:
+  containers:
+  - name: counter
+    image: reg-dhc.app.corpintra.net/example/busybox:1.27
+    command: ["sh", "-c", "shuf -i 0-100 -n 1 >> /usr/local/num.out"]
+    volumeMounts:
+      - mountPath: /usr/local
+        name: test-counter
+    resources:
+      limits:
+        memory: "100Mi"
+        cpu: "100m"
+  - name: dispcounter
+    image: reg-dhc.app.corpintra.net/example/busybox:1.27
+    command: ["sh", "-c", "cat /usr/local/num.out"]
+    volumeMounts:
+      - mountPath: /usr/local
+        name: test-counter
+    resources:
+      limits:
+        memory: "100Mi"
+        cpu: "100m"
+  volumes:
+  - name: test-counter
+    persistentVolumeClaim:
+      claimName: test-counter
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: test-counter
+  #   spec:
+  #     storageClassName: cinder
+  #     accessModes:
+  #     - ReadWriteOnce
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
+  

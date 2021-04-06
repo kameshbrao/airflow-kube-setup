@@ -19,11 +19,8 @@
 
 set -x
 
-ls -ltr 
-ls -ltr /usr/local
 ls -ltr /usr/local/airflow
 
-cat /usr/local/airflow.cfg
 
 cd /usr/local/lib/python3.6/site-packages/airflow && \
 #cp -R example_dags/* /usr/local/airflow/dags/ && \
